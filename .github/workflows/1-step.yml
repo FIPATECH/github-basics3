@@ -64,7 +64,7 @@ jobs:
 
       - name: Passer au workflow suivant
         run: |
-          gh workflow disable "${{ github.workflow }}"
-          gh workflow enable "Step 2"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/disable"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-step.yml/enable"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
