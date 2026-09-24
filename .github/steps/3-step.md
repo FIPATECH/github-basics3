@@ -14,7 +14,7 @@ Elle permet de faire relire son travail avant intégration.
 
 1. Après ton commit, clique sur **Compare & pull request**.
 
-![Créer une pull request](../../images/compare-and-pull-request.png)
+![Créer une pull request](https://github.com/FIPATECH/github-basics3/blob/main/images/compare-and-pull-request.png?raw=true)
 
 2. Vérifie les branches :
 
@@ -23,7 +23,7 @@ Elle permet de faire relire son travail avant intégration.
 
 3. Ajoute une description expliquant ton changement.
 
-![Description d'une pull request](../../images/Pull-request-description.png)
+![Description d'une pull request](https://github.com/FIPATECH/github-basics3/blob/main/images/Pull-request-description.png?raw=true)
 
 4. Clique sur **Create pull request**.
 

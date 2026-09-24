@@ -18,7 +18,7 @@ C'est une pratique fondamentale dans la plupart des projets logiciels.
 
 Dans l'onglet **Code**, GitHub affiche actuellement la branche `main`.
 
-![Menu des branches GitHub](../../images/main-branch-dropdown.png)
+![Menu des branches GitHub](https://github.com/FIPATECH/github-basics3/blob/main/images/main-branch-dropdown.png?raw=true)
 
 ### ⌨️ Exercice : créer `my-first-branch`
 
@@ -31,7 +31,7 @@ Dans l'onglet **Code**, GitHub affiche actuellement la branche `main`.
 my-first-branch
 ```
 
-![Créer une branche GitHub](../../images/create-branch-button.png)
+![Créer une branche GitHub](https://github.com/FIPATECH/github-basics3/blob/main/images/create-branch-button.png?raw=true)
 
 > [!IMPORTANT]
 > Le nom `my-first-branch` est vérifié automatiquement. Utilise exactement ce nom.
