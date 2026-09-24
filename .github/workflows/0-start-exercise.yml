@@ -64,6 +64,9 @@ jobs:
       - name: Passer à l'étape suivante
         run: |
           gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml/disable"
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/enable"
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/enable"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
