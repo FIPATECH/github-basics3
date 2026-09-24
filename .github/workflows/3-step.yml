@@ -142,6 +142,9 @@ jobs:
       - name: Passer au workflow suivant
         run: |
           gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-step.yml/disable"
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-last-step.yml/enable"
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-last-step.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-last-step.yml/enable"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
