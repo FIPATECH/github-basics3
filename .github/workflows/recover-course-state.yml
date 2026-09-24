@@ -1,0 +1,24 @@
+name: Recovery course state
+
+on:
+  push:
+    branches:
+      - my-first-branch
+    paths:
+      - ".github/workflows/recover-course-state.yml"
+
+permissions:
+  actions: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remettre les workflows dans l'état attendu
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml/disable"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/disable"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-step.yml/enable"
