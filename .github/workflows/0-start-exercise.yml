@@ -24,6 +24,7 @@ jobs:
     with:
       exercise-title: "GitHub Basics"
       intro-message: "Ce cours va te guider pas à pas pour découvrir le fonctionnement essentiel de GitHub : branches, commits, pull requests et merge."
+      manage-workflows: true
 
   post_next_step_content:
     name: Afficher l'étape 1
@@ -60,7 +61,9 @@ jobs:
           issue-number: ${{ env.ISSUE_NUMBER }}
           file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
 
-      - name: Activer l'étape suivante
-        run: gh workflow enable "Step 1"
+      - name: Passer à l'étape suivante
+        run: |
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/0-start-exercise.yml/disable"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/enable"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
