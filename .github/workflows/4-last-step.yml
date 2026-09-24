@@ -61,7 +61,7 @@ jobs:
           file: ${{ env.REVIEW_FILE }}
 
       - name: Désactiver le dernier workflow
-        run: gh workflow disable "${{ github.workflow }}"
+        run: gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-last-step.yml/disable"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
