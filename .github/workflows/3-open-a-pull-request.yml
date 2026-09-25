@@ -18,8 +18,8 @@ permissions:
 
 env:
   STEP_4_FILE: ".github/steps/4-merge-your-pull-request.md"
-  TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "cc297e897016fc19c88ac89ecd9b477abdb291d9"
+  TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
+  TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
 
 jobs:
   find_exercise:
@@ -27,7 +27,7 @@ jobs:
       !github.event.repository.is_template &&
       github.head_ref == 'my-first-branch'
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
 
   check_pull_request:
     if: |

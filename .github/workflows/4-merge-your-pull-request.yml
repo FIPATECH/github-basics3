@@ -15,8 +15,8 @@ permissions:
 
 env:
   REVIEW_FILE: ".github/steps/x-review.md"
-  TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "cc297e897016fc19c88ac89ecd9b477abdb291d9"
+  TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
+  TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
 
 jobs:
   explain_unmerged_close:
@@ -44,7 +44,7 @@ jobs:
       github.event.pull_request.merged == true &&
       github.event.pull_request.head.ref == 'my-first-branch'
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
 
   post_review_content:
     name: Publier le bilan dans la pull request
@@ -74,7 +74,7 @@ jobs:
   finish_exercise:
     name: Terminer l'exercice
     needs: [find_exercise, post_review_content]
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/finish-exercise.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
+    uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/finish-exercise.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
     with:
       issue-url: ${{ needs.find_exercise.outputs.issue-url }}
       exercise-title: "GitHub Basics"
