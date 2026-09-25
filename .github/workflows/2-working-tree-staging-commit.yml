@@ -1,11 +1,11 @@
-name: Step 2 # Créer un fichier et un commit
+name: Step 2 # Working tree, staging et commit
 
 on:
   push:
     branches:
-      - "my-first-branch"
+      - "feature/robot-status"
     paths:
-      - "PROFILE.md"
+      - "robot/config.yaml"
 
 permissions:
   contents: read
@@ -13,17 +13,19 @@ permissions:
   issues: write
 
 env:
-  STEP_3_FILE: ".github/steps/3-open-a-pull-request.md"
+  STEP_3_FILE: ".github/steps/3-history-restore-vscode.md"
   TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
   TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
 
 jobs:
   find_exercise:
+    if: |
+      !github.event.repository.is_template
     name: Retrouver l'Issue de l'exercice
     uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
 
   check_step_work:
-    name: Vérifier le fichier et le commit
+    name: Vérifier le premier commit local
     runs-on: ubuntu-latest
     needs: [find_exercise]
     env:
@@ -31,8 +33,10 @@ jobs:
       ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
 
     steps:
-      - name: Récupérer le dépôt
+      - name: Récupérer le dépôt et l'historique
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Récupérer les templates français
         uses: actions/checkout@v6
@@ -58,21 +62,21 @@ jobs:
           file: exercise-toolkit-fr/markdown-templates/step-feedback/checking-work.md
           edit-mode: replace
 
-      - name: Vérifier que PROFILE.md existe
-        id: check-file
+      - name: Vérifier max_speed
+        id: check-config
         continue-on-error: true
-        uses: skills/exercise-toolkit/actions/file-exists@v0.7.1
-        with:
-          file: PROFILE.md
+        shell: bash
+        run: grep -Eq '^[[:space:]]*max_speed:[[:space:]]*0\.8[[:space:]]*$' robot/config.yaml
 
-      - name: Vérifier que PROFILE.md contient Hello
-        id: check-content
+      - name: Vérifier qu'un commit existe sur la branche
+        id: check-commit
         continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: PROFILE.md
-          keyphrase: Hello
-          case-sensitive: false
+        shell: bash
+        run: |
+          git fetch origin main
+          count="$(git rev-list --count origin/main..HEAD)"
+          echo "Commits devant main : $count"
+          test "$count" -ge 1
 
       - name: Publier les résultats
         uses: GrantBirki/comment@v2.1.1
@@ -85,10 +89,10 @@ jobs:
           vars: |
             step_number: 2
             results_table:
-              - description: "Le fichier PROFILE.md existe"
-                passed: ${{ steps.check-file.outcome == 'success' }}
-              - description: "PROFILE.md contient le mot Hello"
-                passed: ${{ steps.check-content.outcome == 'success' }}
+              - description: "robot/config.yaml contient max_speed: 0.8"
+                passed: ${{ steps.check-config.outcome == 'success' }}
+              - description: "La branche contient au moins un commit propre"
+                passed: ${{ steps.check-commit.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue
         if: contains(steps.*.outcome, 'failure')
@@ -129,18 +133,25 @@ jobs:
           issue-number: ${{ env.ISSUE_NUMBER }}
           file: ${{ env.STEP_3_FILE }}
 
+      - name: Indiquer que la progression est surveillée
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
+
       - name: Passer à l'étape 3
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml" --jq '.state')"
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml" --jq '.state')"
           if [ "$current_state" = "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml/disable"
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-working-tree-staging-commit.yml/disable"
           fi
 
-          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml" --jq '.state')"
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-history-restore-vscode.yml" --jq '.state')"
           if [ "$next_state" != "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml/enable"
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-history-restore-vscode.yml/enable"
           fi

@@ -1,4 +1,4 @@
-name: Step 3 # Ouvrir une pull request
+name: Step 4 # Remote et pull request
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ permissions:
   pull-requests: write
 
 env:
-  STEP_4_FILE: ".github/steps/4-merge-your-pull-request.md"
+  STEP_5_FILE: ".github/steps/5-review-merge.md"
   TOOLKIT_REPOSITORY: "ENSTARobotics/exercise-toolkit-fr"
   TOOLKIT_REF: "632879ddcd7da33ae214f828a939a5d4ef93a3bd"
 
@@ -25,51 +25,64 @@ jobs:
   find_exercise:
     if: |
       !github.event.repository.is_template &&
-      github.head_ref == 'my-first-branch'
+      github.head_ref == 'feature/robot-status'
     name: Retrouver l'Issue de l'exercice
     uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
 
   check_pull_request:
     if: |
       !github.event.repository.is_template &&
-      github.head_ref == 'my-first-branch'
-    name: Vérifier directement dans la pull request
+      github.head_ref == 'feature/robot-status'
+    name: Vérifier la pull request
     runs-on: ubuntu-latest
 
     steps:
-      - name: Vérifier le titre et la description puis répondre dans Conversation
-        id: validate
+      - name: Vérifier le contexte et les fichiers
         uses: actions/github-script@v8
         with:
           script: |
             const pr = context.payload.pull_request;
             const title = (pr.title || "").trim();
+            const bodyText = (pr.body || "").trim();
             const titleOk = title.length >= 5 && !/^(test|update|changes|wip)$/i.test(title);
-            const bodyOk = (pr.body || "").trim().length > 0;
-            const marker = "<!-- github-basics:pr-validation -->";
-            const icon = value => value ? "✅" : "❌";
+            const bodyOk = bodyText.length >= 20;
 
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100
+            });
+            const names = new Set(files.map(file => file.filename));
+            const configOk = names.has("robot/config.yaml");
+            const gitignoreOk = names.has(".gitignore");
+
+            const marker = "<!-- tutorial-git-vscode:pr-validation -->";
+            const icon = value => value ? "✅" : "❌";
             const lines = [
               marker,
               "## Vérification de ta pull request",
               "",
-              "Je vérifie ton travail directement ici pour que tu n'aies pas à retourner dans l'Issue du cours.",
+              "Ton travail local est maintenant arrivé sur GitHub. Je vérifie la proposition directement ici.",
               "",
               "| Vérification | Résultat |",
               "| --- | --- |",
               "| Titre suffisamment explicite | " + icon(titleOk) + " |",
-              "| Description non vide | " + icon(bodyOk) + " |",
+              "| Description utile | " + icon(bodyOk) + " |",
+              "| Modification de robot/config.yaml | " + icon(configOk) + " |",
+              "| Mise à jour de .gitignore | " + icon(gitignoreOk) + " |",
               ""
             ];
 
-            if (titleOk && bodyOk) {
-              lines.push("Tout est bon. La prochaine étape va apparaître juste en dessous dans cette conversation.");
-            } else {
-              lines.push("Corrige les éléments marqués ❌. Le bot revérifiera automatiquement la PR après ta modification.");
-            }
+            const passed = titleOk && bodyOk && configOk && gitignoreOk;
+            lines.push(
+              passed
+                ? "Tout est bon. La dernière étape va apparaître dans cette conversation."
+                : "Corrige les éléments marqués ❌. Le bot revérifiera automatiquement la PR."
+            );
 
             const body = lines.join("\n");
-            const { data: comments } = await github.rest.issues.listComments({
+            const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
@@ -97,9 +110,7 @@ jobs:
               });
             }
 
-            core.setOutput("passed", titleOk && bodyOk ? "true" : "false");
-
-            if (!(titleOk && bodyOk)) {
+            if (!passed) {
               core.setFailed("La pull request n'est pas encore conforme.");
             }
 
@@ -108,19 +119,18 @@ jobs:
     needs: [find_exercise, check_pull_request]
     runs-on: ubuntu-latest
     env:
-      ISSUE_REPOSITORY: ${{ github.repository }}
       ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
 
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v6
 
-      - name: Publier l'étape 4 dans la Conversation de la PR
+      - name: Publier l'étape 5 dans la Conversation
         uses: GrantBirki/comment@v2.1.1
         with:
           repository: ${{ github.repository }}
           issue-number: ${{ github.event.pull_request.number }}
-          file: ${{ env.STEP_4_FILE }}
+          file: ${{ env.STEP_5_FILE }}
 
       - name: Laisser une trace dans l'Issue du cours
         uses: actions/github-script@v8
@@ -133,21 +143,21 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: Number(process.env.ISSUE_NUMBER),
-              body: "✅ Ta pull request #" + pr.number + " est valide. La suite du cours se déroule maintenant directement dans sa [Conversation](" + pr.html_url + ")."
+              body: "✅ Ta pull request #" + pr.number + " est valide. La suite du tutoriel se déroule maintenant directement dans sa [Conversation](" + pr.html_url + ")."
             });
 
-      - name: Passer à l'étape 4
+      - name: Passer à l'étape 5
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml" --jq '.state')"
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-remotes-and-pull-request.yml" --jq '.state')"
           if [ "$current_state" = "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml/disable"
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-remotes-and-pull-request.yml/disable"
           fi
 
-          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml" --jq '.state')"
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml" --jq '.state')"
           if [ "$next_state" != "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml/enable"
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml/enable"
           fi

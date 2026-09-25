@@ -1,4 +1,4 @@
-name: Step 4 # Merger la pull request
+name: Step 5 # Review et merge
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ jobs:
   explain_unmerged_close:
     if: |
       !github.event.repository.is_template &&
-      github.event.pull_request.head.ref == 'my-first-branch' &&
+      github.event.pull_request.head.ref == 'feature/robot-status' &&
       github.event.pull_request.merged == false
     name: Expliquer une fermeture sans merge
     runs-on: ubuntu-latest
@@ -35,14 +35,14 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
-              body: "Cette pull request a été fermée sans être mergée. Rouvre-la, puis utilise **Merge pull request** lorsque tu es prêt à intégrer ton changement dans `main`."
+              body: "Cette pull request a été fermée sans être mergée. Rouvre-la puis utilise **Merge pull request** lorsque le changement est prêt."
             });
 
   find_exercise:
     if: |
       !github.event.repository.is_template &&
       github.event.pull_request.merged == true &&
-      github.event.pull_request.head.ref == 'my-first-branch'
+      github.event.pull_request.head.ref == 'feature/robot-status'
     name: Retrouver l'Issue de l'exercice
     uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
 
@@ -66,9 +66,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml" --jq '.state')"
+          state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml" --jq '.state')"
           if [ "$state" = "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml/disable"
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/5-review-merge.yml/disable"
           fi
 
   finish_exercise:
@@ -77,4 +77,4 @@ jobs:
     uses: ENSTARobotics/exercise-toolkit-fr/.github/workflows/finish-exercise.yml@632879ddcd7da33ae214f828a939a5d4ef93a3bd
     with:
       issue-url: ${{ needs.find_exercise.outputs.issue-url }}
-      exercise-title: "GitHub Basics"
+      exercise-title: "Git & VS Code"

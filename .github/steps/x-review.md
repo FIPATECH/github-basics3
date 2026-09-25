@@ -1,56 +1,107 @@
-<!-- github-basics:review -->
+<!-- tutorial-git-vscode:review -->
 
-## Bilan : tu as terminé GitHub Basics
+## Bilan : ton workflow Git local est complet
 
-🎉 Ta première contribution GitHub est mergée.
+🎉 Tu viens d'effectuer le cycle Git que tu réutiliseras sur les projets du club.
 
-<img src="https://octodex.github.com/images/collabocats.jpg" alt="Octocats collaborant" width="300" align="right" />
-
-### Le cycle que tu viens de pratiquer
-
-1. **Dépôt** : le projet et son historique.
-2. **Issue** : un fil de suivi pour une tâche, un problème ou un objectif.
-3. **Branche** : une version parallèle utilisée pour préparer un changement.
-4. **Fichier Markdown** : un fichier texte structuré, ici `PROFILE.md`.
-5. **Commit** : un enregistrement identifié de modifications dans l'historique.
-6. **Pull request** : une proposition pour intégrer une branche dans une autre.
-7. **Diff** : la vue exacte des lignes modifiées par cette proposition.
-8. **Check** : une vérification automatique.
-9. **Review** : une relecture humaine du changement.
-10. **Merge** : l'intégration du changement dans `main`.
-
-### Git et GitHub
-
-**Git** est le système de gestion de versions qui enregistre les commits et les branches.
-
-**GitHub** héberge les dépôts Git et ajoute les outils de collaboration que tu viens d'utiliser : pull requests, reviews, Issues et GitHub Actions.
-
-### Quelques habitudes à garder
-
-- crée une branche pour isoler ton travail ;
-- relis ce que tu vas committer ;
-- écris ou vérifie un message de commit compréhensible ;
-- explique le but d'une pull request ;
-- lis toujours le diff avant de merger ;
-- regarde les checks avant d'intégrer un changement ;
-- demande une review lorsqu'un second regard est utile.
-
-### La suite logique pour le club
-
-Dans ce cours, tu as volontairement utilisé l'interface web pour voir chaque notion séparément.
-
-Dans un vrai projet du club, tu travailleras surtout avec **Git en ligne de commande et VS Code**. Le prochain tutoriel devra donc reprendre exactement le même cycle, mais depuis une copie locale du dépôt :
+### Ce que tu as réellement fait
 
 ```text
-clone → branche → modification dans VS Code → git status → git add → commit → push → pull request
+git clone
+   ↓
+git status
+   ↓
+git switch -c feature/...
+   ↓
+modifier dans VS Code
+   ↓
+git diff
+   ↓
+git add
+   ↓
+git diff --staged
+   ↓
+git commit
+   ↓
+git push
+   ↓
+pull request
+   ↓
+review
+   ↓
+merge
 ```
 
-Ce sera le bon moment pour introduire proprement dépôt local, staging area, remote `origin`, `push`, `pull`, conflits et résolution dans VS Code.
+Tu as aussi utilisé :
 
-Documentation officielle : <https://docs.github.com/>
+- `git remote -v` pour voir où se trouve `origin` ;
+- `git log` et `git show` pour inspecter l'historique ;
+- `git restore` et `git restore --staged` pour revenir proprement sur une action locale ;
+- `git fetch` pour mettre à jour ta connaissance du dépôt distant ;
+- le panneau **Source Control** de VS Code comme autre interface sur le même moteur Git.
 
-Le plus important à retenir pour l'instant :
+### Dernière étape sur ton ordinateur : resynchroniser `main`
 
-```text
-branche → modification → commit → pull request → review/checks → merge
+Le merge vient d'avoir lieu sur GitHub. Ton dépôt local possède encore son ancien `main`.
+
+Dans le terminal de VS Code :
+
+```bash
+git switch main
+git pull --ff-only
 ```
+
+`git pull --ff-only` met à jour `main` uniquement si Git peut avancer proprement sans fabriquer de merge local inattendu.
+
+Supprime ensuite la branche locale devenue inutile :
+
+```bash
+git branch -d feature/robot-status
+```
+
+Et nettoie les références distantes qui n'existent plus :
+
+```bash
+git fetch --prune
+```
+
+Termine par :
+
+```bash
+git status
+git branch -vv
+git log --oneline --graph --decorate --all
+```
+
+### Le réflexe à garder
+
+Quand quelque chose te paraît étrange :
+
+```bash
+git status
+```
+
+Avant un commit :
+
+```bash
+git diff
+git diff --staged
+```
+
+Avant de commencer une nouvelle tâche :
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/ma-tache
+```
+
+### Ce qui vient ensuite
+
+Tu connais maintenant le chemin normal. Le prochain tutoriel utile sera consacré à ce qui arrive quand deux historiques se rencontrent mal : **les conflits de merge**, leur lecture et leur résolution dans VS Code.
+
+Pour aller plus loin en attendant :
+
+- documentation Git : <https://git-scm.com/doc>
+- documentation GitHub sur Git : <https://docs.github.com/get-started/using-git>
+- documentation VS Code Source Control : <https://code.visualstudio.com/docs/sourcecontrol/overview>
