@@ -1,0 +1,80 @@
+name: Step 4 # Merger la pull request
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+  pull-requests: write
+
+env:
+  REVIEW_FILE: ".github/steps/x-review.md"
+  TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
+  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
+
+jobs:
+  explain_unmerged_close:
+    if: |
+      !github.event.repository.is_template &&
+      github.event.pull_request.head.ref == 'my-first-branch' &&
+      github.event.pull_request.merged == false
+    name: Expliquer une fermeture sans merge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Répondre dans la pull request
+        uses: actions/github-script@v8
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: "Cette pull request a été fermée sans être mergée. Rouvre-la, puis utilise **Merge pull request** lorsque tu es prêt à intégrer ton changement dans `main`."
+            });
+
+  find_exercise:
+    if: |
+      !github.event.repository.is_template &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'my-first-branch'
+    name: Retrouver l'Issue de l'exercice
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+
+  post_review_content:
+    name: Publier le bilan dans la pull request
+    needs: [find_exercise]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Publier le bilan final dans Conversation
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number }}
+          file: ${{ env.REVIEW_FILE }}
+
+      - name: Désactiver le dernier workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml" --jq '.state')"
+          if [ "$state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml/disable"
+          fi
+
+  finish_exercise:
+    name: Terminer l'exercice
+    needs: [find_exercise, post_review_content]
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/finish-exercise.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+    with:
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
+      exercise-title: "GitHub Basics"

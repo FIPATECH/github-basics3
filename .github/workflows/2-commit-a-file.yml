@@ -1,11 +1,11 @@
-name: Step 2 # Faire un commit
+name: Step 2 # Créer un fichier et un commit
 
 on:
   push:
     branches:
       - "my-first-branch"
     paths:
-      - "playground/README.md"
+      - "PROFILE.md"
 
 permissions:
   contents: read
@@ -13,17 +13,17 @@ permissions:
   issues: write
 
 env:
-  STEP_3_FILE: ".github/steps/3-step.md"
+  STEP_3_FILE: ".github/steps/3-open-a-pull-request.md"
   TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "main"
+  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
 
 jobs:
   find_exercise:
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@main
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
 
   check_step_work:
-    name: Vérifier le travail
+    name: Vérifier le fichier et le commit
     runs-on: ubuntu-latest
     needs: [find_exercise]
     env:
@@ -32,16 +32,16 @@ jobs:
 
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Récupérer les templates français
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.TOOLKIT_REPOSITORY }}
           path: exercise-toolkit-fr
           ref: ${{ env.TOOLKIT_REF }}
 
-      - name: Retrouver le dernier commentaire
+      - name: Retrouver le dernier commentaire de progression
         id: find-last-comment
         uses: peter-evans/find-comment@v3
         with:
@@ -58,20 +58,29 @@ jobs:
           file: exercise-toolkit-fr/markdown-templates/step-feedback/checking-work.md
           edit-mode: replace
 
-      - name: Vérifier l'existence de playground/README.md
-        id: check-file-exists
+      - name: Vérifier que PROFILE.md existe
+        id: check-file
         continue-on-error: true
         uses: skills/exercise-toolkit/actions/file-exists@v0.7.1
         with:
-          file: playground/README.md
+          file: PROFILE.md
 
-      - name: Vérifier la présence du mot Hello
-        id: check-for-keyphrase
+      - name: Vérifier que PROFILE.md contient Hello
+        id: check-content
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
-          text-file: playground/README.md
+          text-file: PROFILE.md
           keyphrase: Hello
+          case-sensitive: false
+
+      - name: Vérifier le message de commit
+        id: check-commit-message
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text: ${{ github.event.head_commit.message }}
+          keyphrase: "Ajouter PROFILE.md"
           case-sensitive: false
 
       - name: Publier les résultats
@@ -85,10 +94,12 @@ jobs:
           vars: |
             step_number: 2
             results_table:
-              - description: "Le fichier playground/README.md existe"
-                passed: ${{ steps.check-file-exists.outcome == 'success' }}
-              - description: "Le fichier contient le mot Hello"
-                passed: ${{ steps.check-for-keyphrase.outcome == 'success' }}
+              - description: "Le fichier PROFILE.md existe"
+                passed: ${{ steps.check-file.outcome == 'success' }}
+              - description: "PROFILE.md contient le mot Hello"
+                passed: ${{ steps.check-content.outcome == 'success' }}
+              - description: "Le message du commit contient Ajouter PROFILE.md"
+                passed: ${{ steps.check-commit-message.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue
         if: contains(steps.*.outcome, 'failure')
@@ -104,10 +115,10 @@ jobs:
 
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Récupérer les templates français
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.TOOLKIT_REPOSITORY }}
           path: exercise-toolkit-fr
@@ -129,19 +140,18 @@ jobs:
           issue-number: ${{ env.ISSUE_NUMBER }}
           file: ${{ env.STEP_3_FILE }}
 
-      - name: Indiquer que la progression est surveillée
-        uses: GrantBirki/comment@v2.1.1
-        with:
-          repository: ${{ env.ISSUE_REPOSITORY }}
-          issue-number: ${{ env.ISSUE_NUMBER }}
-          file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
-
-      - name: Passer au workflow suivant
-        run: |
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-step.yml/disable"
-          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-step.yml" --jq '.state')"
-          if [ "$next_state" != "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-step.yml/enable"
-          fi
+      - name: Passer à l'étape 3
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml" --jq '.state')"
+          if [ "$current_state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml/disable"
+          fi
+
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml/enable"
+          fi

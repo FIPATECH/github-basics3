@@ -11,14 +11,14 @@ permissions:
   issues: write
 
 env:
-  STEP_2_FILE: ".github/steps/2-step.md"
+  STEP_2_FILE: ".github/steps/2-commit-a-file.md"
   TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "main"
+  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
 
 jobs:
   find_exercise:
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@main
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
 
   post_next_step_content:
     name: Afficher l'étape 2
@@ -30,10 +30,10 @@ jobs:
 
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Récupérer les templates français
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ env.TOOLKIT_REPOSITORY }}
           path: exercise-toolkit-fr
@@ -62,12 +62,18 @@ jobs:
           issue-number: ${{ env.ISSUE_NUMBER }}
           file: exercise-toolkit-fr/markdown-templates/step-feedback/watching-for-progress.md
 
-      - name: Passer au workflow suivant
-        run: |
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-step.yml/disable"
-          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-step.yml" --jq '.state')"
-          if [ "$next_state" != "active" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-step.yml/enable"
-          fi
+      - name: Passer à l'étape 2
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/1-create-a-branch.yml" --jq '.state')"
+          if [ "$current_state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/1-create-a-branch.yml/disable"
+          fi
+
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/2-commit-a-file.yml/enable"
+          fi

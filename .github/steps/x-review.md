@@ -1,86 +1,54 @@
-## Bilan du cours
+<!-- github-basics:review -->
 
-🎉 Félicitations, tu viens de terminer **GitHub Basics** !
+## Bilan : tu as terminé GitHub Basics
+
+🎉 Ta première contribution GitHub est mergée.
 
 <img src="https://octodex.github.com/images/collabocats.jpg" alt="Octocats collaborant" width="300" align="right" />
 
-Tu viens d'effectuer un workflow de contribution complet sur GitHub.
+### Le cycle que tu viens de pratiquer
 
-### Ce que tu as pratiqué
+1. **Dépôt** : le projet et son historique.
+2. **Branche** : une version parallèle utilisée pour préparer un changement.
+3. **Fichier Markdown** : un fichier texte structuré, ici `PROFILE.md`.
+4. **Commit** : un enregistrement identifié de modifications dans l'historique.
+5. **Pull request** : une proposition pour intégrer une branche dans une autre.
+6. **Diff** : la vue exacte des lignes modifiées par cette proposition.
+7. **Check** : une vérification automatique.
+8. **Review** : une relecture humaine du changement.
+9. **Merge** : l'intégration du changement dans `main`.
 
-Tu as :
+### Git et GitHub
 
-- créé une branche à partir de `main` ;
-- modifié un fichier sans toucher directement à la branche principale ;
-- créé un commit avec ton changement ;
-- poussé ton travail sur GitHub ;
-- ouvert une pull request ;
-- décrit l'objectif de ton changement ;
-- examiné le diff entre deux branches ;
-- mergé ta contribution dans `main`.
+**Git** est le système de gestion de versions qui enregistre les commits et les branches.
 
-### Le workflow à retenir
+**GitHub** héberge les dépôts Git et ajoute les outils de collaboration que tu viens d'utiliser : pull requests, reviews, Issues et GitHub Actions.
 
-```text
-main
-  │
-  ├── créer une branche
-  │
-  ▼
-branche de travail
-  │
-  ├── modifier des fichiers
-  ├── commit
-  ├── push
-  │
-  ▼
-pull request
-  │
-  ├── review
-  ├── checks
-  ├── corrections éventuelles
-  │
-  ▼
-merge
-  │
-  ▼
-main mis à jour
-```
+Une **Issue** est un fil de suivi utilisé pour discuter d'une tâche, d'un bug ou d'un objectif. Dans ce cours, l'Issue servait de journal de progression jusqu'à l'ouverture de ta pull request.
 
-Ce modèle, avec des variantes, est utilisé dans énormément de projets logiciels.
+### Quelques habitudes à garder
 
-### Quelques bonnes habitudes
+- crée une branche pour isoler ton travail ;
+- écris des commits compréhensibles ;
+- explique le but d'une pull request ;
+- lis toujours le diff avant de merger ;
+- regarde les checks avant d'intégrer un changement ;
+- demande une review lorsqu'un second regard est utile.
 
-- Évite de développer directement sur `main`.
-- Fais des commits cohérents et compréhensibles.
-- Donne à tes branches et à tes PR des noms explicites.
-- Relis toujours le diff avant de merger.
-- Explique le **pourquoi** d'un changement, pas uniquement le **quoi**.
-- Demande une review lorsqu'un changement mérite un second regard.
-- Synchronise régulièrement ton dépôt local avec le dépôt distant.
+### Et maintenant ?
 
-### Git et GitHub ne sont pas la même chose
+Tu peux continuer avec :
 
-À retenir :
-
-- **Git** est le système de gestion de versions distribué ;
-- **GitHub** est une plateforme qui héberge des dépôts Git et ajoute des outils de collaboration : pull requests, Issues, Actions, reviews, permissions, etc.
-
-Tu peux utiliser Git sans GitHub, et GitHub s'appuie sur Git pour le versionnement.
-
-### Pour aller plus loin
-
-Tu peux maintenant explorer :
-
-- les commandes Git en ligne de commande ;
-- les reviews et suggestions de code ;
-- les Issues ;
-- GitHub Actions et la CI/CD ;
-- les tags et releases ;
-- les stratégies de branches ;
-- les conflits et le rebase ;
-- les fichiers `.gitignore`.
+- les commentaires et suggestions de review ;
+- les Issues pour organiser le travail ;
+- GitHub Actions pour automatiser tests et validations ;
+- les conflits de merge et le rebase ;
+- les tags et releases.
 
 Documentation officielle : <https://docs.github.com/>
 
-L'objectif n'est pas de mémoriser toutes les commandes immédiatement. Le plus important est de comprendre le cycle **branche → commit → pull request → review → merge** et de le pratiquer régulièrement.
+Le plus important n'est pas de mémoriser tous les boutons. Retient surtout le cycle :
+
+```text
+branche → modification → commit → pull request → review/checks → merge
+```

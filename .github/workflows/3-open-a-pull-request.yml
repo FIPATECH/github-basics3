@@ -1,0 +1,152 @@
+name: Step 3 # Ouvrir une pull request
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+  pull-requests: write
+
+env:
+  STEP_4_FILE: ".github/steps/4-merge-your-pull-request.md"
+  TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
+  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
+
+jobs:
+  find_exercise:
+    if: |
+      !github.event.repository.is_template &&
+      github.head_ref == 'my-first-branch'
+    name: Retrouver l'Issue de l'exercice
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+
+  check_pull_request:
+    if: |
+      !github.event.repository.is_template &&
+      github.head_ref == 'my-first-branch'
+    name: Vérifier directement dans la pull request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Vérifier le titre et la description puis répondre dans Conversation
+        id: validate
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const titleOk = (pr.title || "").trim() === "Ajouter mon profil";
+            const bodyOk = (pr.body || "").trim().length > 0;
+            const marker = "<!-- github-basics:pr-validation -->";
+            const icon = value => value ? "✅" : "❌";
+
+            const lines = [
+              marker,
+              "## Vérification de ta pull request",
+              "",
+              "Je vérifie ton travail directement ici pour que tu n'aies pas à retourner dans l'Issue du cours.",
+              "",
+              "| Vérification | Résultat |",
+              "| --- | --- |",
+              "| Titre exact : `Ajouter mon profil` | " + icon(titleOk) + " |",
+              "| Description non vide | " + icon(bodyOk) + " |",
+              ""
+            ];
+
+            if (titleOk && bodyOk) {
+              lines.push("Tout est bon. La prochaine étape va apparaître juste en dessous dans cette conversation.");
+            } else {
+              lines.push("Corrige les éléments marqués ❌. Le bot revérifiera automatiquement la PR après ta modification.");
+            }
+
+            const body = lines.join("\n");
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              per_page: 100
+            });
+
+            const existing = comments.find(comment =>
+              comment.user?.login === "github-actions[bot]" &&
+              (comment.body || "").includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body
+              });
+            }
+
+            core.setOutput("passed", titleOk && bodyOk ? "true" : "false");
+
+            if (!(titleOk && bodyOk)) {
+              core.setFailed("La pull request n'est pas encore conforme.");
+            }
+
+  post_next_step_content:
+    name: Continuer le cours dans la pull request
+    needs: [find_exercise, check_pull_request]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Publier l'étape 4 dans la Conversation de la PR
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number }}
+          file: ${{ env.STEP_4_FILE }}
+
+      - name: Laisser une trace dans l'Issue du cours
+        uses: actions/github-script@v8
+        env:
+          ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.ISSUE_NUMBER),
+              body: "✅ Ta pull request #" + pr.number + " est valide. La suite du cours se déroule maintenant directement dans sa [Conversation](" + pr.html_url + ")."
+            });
+
+      - name: Passer à l'étape 4
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          current_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml" --jq '.state')"
+          if [ "$current_state" = "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/3-open-a-pull-request.yml/disable"
+          fi
+
+          next_state="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml" --jq '.state')"
+          if [ "$next_state" != "active" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/4-merge-your-pull-request.yml/enable"
+          fi
