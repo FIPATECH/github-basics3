@@ -24,7 +24,7 @@ Un message clair rend l'historique compréhensible pour toi et pour les autres c
 1. Dans l'onglet **Code**, vérifie que la branche affichée est bien `my-first-branch`.
 2. Clique sur **Add file**, puis **Create new file**.
 
-   <img width="300" alt="Créer un nouveau fichier dans GitHub" src="../images/create-new-file-option.png">
+   <img width="300" alt="Créer un nouveau fichier dans GitHub" src="https://github.com/FIPATECH/github-basics3/blob/main/.github/images/create-new-file-option.png?raw=true">
 
 3. Dans **Name your file...**, saisis :
 
@@ -42,7 +42,7 @@ Un message clair rend l'historique compréhensible pour toi et pour les autres c
    Je découvre les branches, les commits et la collaboration sur GitHub.
    ```
 
-   ![Éditeur GitHub contenant PROFILE.md](../images/add-profile-file.png)
+   ![Éditeur GitHub contenant PROFILE.md](https://github.com/FIPATECH/github-basics3/blob/main/.github/images/add-profile-file.png?raw=true)
 
 5. Clique sur **Commit changes...**.
 6. Dans **Commit message**, écris exactement :
@@ -51,7 +51,7 @@ Un message clair rend l'historique compréhensible pour toi et pour les autres c
    Ajouter PROFILE.md
    ```
 
-   <img width="400" alt="Boîte de dialogue du message de commit" src="../images/commit-message-dialog.png">
+   <img width="400" alt="Boîte de dialogue du message de commit" src="https://github.com/FIPATECH/github-basics3/blob/main/.github/images/commit-message-dialog.png?raw=true">
 
 7. Confirme avec **Commit changes**.
 
