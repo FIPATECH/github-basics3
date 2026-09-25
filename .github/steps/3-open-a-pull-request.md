@@ -17,7 +17,7 @@ Ouvrir une pull request ne modifie pas encore `main`. Tu demandes simplement : �
 
 Après ton commit, GitHub peut afficher **Compare & pull request** :
 
-![Bouton Compare & pull request](https://github.com/FIPATECH/github-basics3/blob/main/.github/images/compare-pull-request-button.png?raw=true)
+![Bouton Compare & pull request](../images/compare-pull-request-button.png)
 
 Tu peux cliquer dessus. Sinon, utilise directement :
 
@@ -31,18 +31,24 @@ Si tu passes par l'interface manuelle :
    - **base** : `main`
    - **compare** : `my-first-branch`
 
-   ![Choix des branches d'une pull request](https://github.com/FIPATECH/github-basics3/blob/main/.github/images/branch-selection-comparison.png?raw=true)
+   ![Choix des branches d'une pull request](../images/branch-selection-comparison.png)
 
 4. Clique sur **Create pull request**.
 
 ### Donner du contexte aux autres
 
-Une PR doit expliquer ce qu'elle propose.
+Une bonne PR permet de comprendre le changement sans devoir deviner son intention.
 
-Utilise exactement ce titre :
+Choisis un titre court et explicite, par exemple :
 
 ```text
 Ajouter mon profil
+```
+
+ou :
+
+```text
+Add PROFILE.md
 ```
 
 Puis ajoute une courte description, par exemple :
@@ -53,12 +59,12 @@ Puis ajoute une courte description, par exemple :
 J'ai ajouté PROFILE.md afin de pratiquer mon premier cycle de contribution sur GitHub.
 ```
 
-![Formulaire de création d'une pull request](https://github.com/FIPATECH/github-basics3/blob/main/.github/images/create-pull-request-form.png?raw=true)
+![Formulaire de création d'une pull request](../images/create-pull-request-form.png)
 
 Clique enfin sur **Create pull request**.
 
 > [!IMPORTANT]
-> Mona vérifiera le titre et la présence d'une description.
+> Mona vérifiera que le titre est suffisamment explicite et qu'une description est présente. Tu n'as plus de phrase exacte à recopier.
 
 ### Ensuite, reste dans la pull request
 

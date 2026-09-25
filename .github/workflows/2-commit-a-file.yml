@@ -15,12 +15,12 @@ permissions:
 env:
   STEP_3_FILE: ".github/steps/3-open-a-pull-request.md"
   TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
+  TOOLKIT_REF: "cc297e897016fc19c88ac89ecd9b477abdb291d9"
 
 jobs:
   find_exercise:
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
 
   check_step_work:
     name: Vérifier le fichier et le commit
@@ -74,15 +74,6 @@ jobs:
           keyphrase: Hello
           case-sensitive: false
 
-      - name: Vérifier le message de commit
-        id: check-commit-message
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text: ${{ github.event.head_commit.message }}
-          keyphrase: "Ajouter PROFILE.md"
-          case-sensitive: false
-
       - name: Publier les résultats
         uses: GrantBirki/comment@v2.1.1
         with:
@@ -98,8 +89,6 @@ jobs:
                 passed: ${{ steps.check-file.outcome == 'success' }}
               - description: "PROFILE.md contient le mot Hello"
                 passed: ${{ steps.check-content.outcome == 'success' }}
-              - description: "Le message du commit contient Ajouter PROFILE.md"
-                passed: ${{ steps.check-commit-message.outcome == 'success' }}
 
       - name: Arrêter si une vérification échoue
         if: contains(steps.*.outcome, 'failure')

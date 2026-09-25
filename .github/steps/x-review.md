@@ -9,14 +9,15 @@
 ### Le cycle que tu viens de pratiquer
 
 1. **Dépôt** : le projet et son historique.
-2. **Branche** : une version parallèle utilisée pour préparer un changement.
-3. **Fichier Markdown** : un fichier texte structuré, ici `PROFILE.md`.
-4. **Commit** : un enregistrement identifié de modifications dans l'historique.
-5. **Pull request** : une proposition pour intégrer une branche dans une autre.
-6. **Diff** : la vue exacte des lignes modifiées par cette proposition.
-7. **Check** : une vérification automatique.
-8. **Review** : une relecture humaine du changement.
-9. **Merge** : l'intégration du changement dans `main`.
+2. **Issue** : un fil de suivi pour une tâche, un problème ou un objectif.
+3. **Branche** : une version parallèle utilisée pour préparer un changement.
+4. **Fichier Markdown** : un fichier texte structuré, ici `PROFILE.md`.
+5. **Commit** : un enregistrement identifié de modifications dans l'historique.
+6. **Pull request** : une proposition pour intégrer une branche dans une autre.
+7. **Diff** : la vue exacte des lignes modifiées par cette proposition.
+8. **Check** : une vérification automatique.
+9. **Review** : une relecture humaine du changement.
+10. **Merge** : l'intégration du changement dans `main`.
 
 ### Git et GitHub
 
@@ -24,30 +25,31 @@
 
 **GitHub** héberge les dépôts Git et ajoute les outils de collaboration que tu viens d'utiliser : pull requests, reviews, Issues et GitHub Actions.
 
-Une **Issue** est un fil de suivi utilisé pour discuter d'une tâche, d'un bug ou d'un objectif. Dans ce cours, l'Issue servait de journal de progression jusqu'à l'ouverture de ta pull request.
-
 ### Quelques habitudes à garder
 
 - crée une branche pour isoler ton travail ;
-- écris des commits compréhensibles ;
+- relis ce que tu vas committer ;
+- écris ou vérifie un message de commit compréhensible ;
 - explique le but d'une pull request ;
 - lis toujours le diff avant de merger ;
 - regarde les checks avant d'intégrer un changement ;
 - demande une review lorsqu'un second regard est utile.
 
-### Et maintenant ?
+### La suite logique pour le club
 
-Tu peux continuer avec :
+Dans ce cours, tu as volontairement utilisé l'interface web pour voir chaque notion séparément.
 
-- les commentaires et suggestions de review ;
-- les Issues pour organiser le travail ;
-- GitHub Actions pour automatiser tests et validations ;
-- les conflits de merge et le rebase ;
-- les tags et releases.
+Dans un vrai projet du club, tu travailleras surtout avec **Git en ligne de commande et VS Code**. Le prochain tutoriel devra donc reprendre exactement le même cycle, mais depuis une copie locale du dépôt :
+
+```text
+clone → branche → modification dans VS Code → git status → git add → commit → push → pull request
+```
+
+Ce sera le bon moment pour introduire proprement dépôt local, staging area, remote `origin`, `push`, `pull`, conflits et résolution dans VS Code.
 
 Documentation officielle : <https://docs.github.com/>
 
-Le plus important n'est pas de mémoriser tous les boutons. Retient surtout le cycle :
+Le plus important à retenir pour l'instant :
 
 ```text
 branche → modification → commit → pull request → review/checks → merge

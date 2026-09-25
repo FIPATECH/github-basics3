@@ -13,14 +13,14 @@ permissions:
 env:
   STEP_1_FILE: ".github/steps/1-create-a-branch.md"
   TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
+  TOOLKIT_REF: "cc297e897016fc19c88ac89ecd9b477abdb291d9"
 
 jobs:
   start_exercise:
     if: |
       !github.event.repository.is_template
     name: Démarrer l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/start-exercise.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/start-exercise.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
     with:
       exercise-title: "GitHub Basics"
       intro-message: "Tu vas découvrir GitHub en pratiquant : d'abord dans l'Issue du cours, puis directement dans la conversation de ta pull request."

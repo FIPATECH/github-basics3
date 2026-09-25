@@ -19,7 +19,7 @@ permissions:
 env:
   STEP_4_FILE: ".github/steps/4-merge-your-pull-request.md"
   TOOLKIT_REPOSITORY: "ENSTASIMOV/exercise-toolkit-fr"
-  TOOLKIT_REF: "eab737f3cbe71091795ec3b2342d1640c696d50b"
+  TOOLKIT_REF: "cc297e897016fc19c88ac89ecd9b477abdb291d9"
 
 jobs:
   find_exercise:
@@ -27,7 +27,7 @@ jobs:
       !github.event.repository.is_template &&
       github.head_ref == 'my-first-branch'
     name: Retrouver l'Issue de l'exercice
-    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@eab737f3cbe71091795ec3b2342d1640c696d50b
+    uses: ENSTASIMOV/exercise-toolkit-fr/.github/workflows/find-exercise-issue.yml@cc297e897016fc19c88ac89ecd9b477abdb291d9
 
   check_pull_request:
     if: |
@@ -43,7 +43,8 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const titleOk = (pr.title || "").trim() === "Ajouter mon profil";
+            const title = (pr.title || "").trim();
+            const titleOk = title.length >= 5 && !/^(test|update|changes|wip)$/i.test(title);
             const bodyOk = (pr.body || "").trim().length > 0;
             const marker = "<!-- github-basics:pr-validation -->";
             const icon = value => value ? "✅" : "❌";
@@ -56,7 +57,7 @@ jobs:
               "",
               "| Vérification | Résultat |",
               "| --- | --- |",
-              "| Titre exact : `Ajouter mon profil` | " + icon(titleOk) + " |",
+              "| Titre suffisamment explicite | " + icon(titleOk) + " |",
               "| Description non vide | " + icon(bodyOk) + " |",
               ""
             ];
